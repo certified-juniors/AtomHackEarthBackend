@@ -19,17 +19,17 @@ func (app *Application) Run() {
 	docs.SwaggerInfo.Description = "API server for Earth application"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Host = "localhost:8081"
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.BasePath = "/api"
 
 	r.Use(middleware.CorsMiddleware())
 
-	ApiGroup := r.Group("/api/v1")
+	ApiGroup := r.Group("/api")
 	{
 		DocumentGroup := ApiGroup.Group("/document")
 		{	
 			DocumentGroup.GET("/formed", app.handler.GetFormedDocuments)
 			DocumentGroup.GET("/:docID", app.handler.GetDocumentByID)
-			DocumentGroup.POST("/", app.handler.AcceptDocument)
+			DocumentGroup.POST("/send-to-earth", app.handler.AcceptDocument)
 		}
 	}
 

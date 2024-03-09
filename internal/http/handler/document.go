@@ -76,7 +76,7 @@ func (h *Handler) GetDocumentByID(c *gin.Context) {
 // @Success 200 {object} model.AcceptDocument "Успешный ответ"
 // @Failure 400 {object} model.ErrorResponse "Ошибка в запросе"
 // @Failure 500 {object} model.ErrorResponse "Внутренняя ошибка сервера"
-// @Router /document/ [post]
+// @Router /document/send-to-earth [post]
 func (h *Handler) AcceptDocument(c *gin.Context) {
 	acceptID, err := strconv.Atoi(c.Query("id"))
 	if err != nil {

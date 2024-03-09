@@ -1,4 +1,4 @@
-basePath: /api/v1
+basePath: /api
 definitions:
   model.AcceptDocument:
     properties:
@@ -76,61 +76,6 @@ info:
   title: AtomHackMarsBackend RestAPI
   version: "1.0"
 paths:
-  /document/:
-    post:
-      consumes:
-      - application/json
-      description: Принимает новый документ с параметрами id, title, owner, createdAt,
-        payload и files.
-      parameters:
-      - description: ID документа
-        in: query
-        name: id
-        required: true
-        type: integer
-      - description: Заголовок документа
-        in: query
-        name: title
-        required: true
-        type: string
-      - description: Владелец документа
-        in: query
-        name: owner
-        required: true
-        type: string
-      - description: Дата и время создания документа в формате RFC3339
-        in: query
-        name: createdAt
-        required: true
-        type: string
-      - description: Payload документа
-        in: query
-        name: payload
-        required: true
-        type: string
-      - description: Файлы, прикрепленные к документу
-        in: formData
-        name: files
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ
-          schema:
-            $ref: '#/definitions/model.AcceptDocument'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Принимает новый документ.
-      tags:
-      - Документы
   /document/{docID}:
     get:
       consumes:
@@ -191,6 +136,61 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Возвращает сформированные документы.
+      tags:
+      - Документы
+  /document/send-to-earth:
+    post:
+      consumes:
+      - application/json
+      description: Принимает новый документ с параметрами id, title, owner, createdAt,
+        payload и files.
+      parameters:
+      - description: ID документа
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Заголовок документа
+        in: query
+        name: title
+        required: true
+        type: string
+      - description: Владелец документа
+        in: query
+        name: owner
+        required: true
+        type: string
+      - description: Дата и время создания документа в формате RFC3339
+        in: query
+        name: createdAt
+        required: true
+        type: string
+      - description: Payload документа
+        in: query
+        name: payload
+        required: true
+        type: string
+      - description: Файлы, прикрепленные к документу
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/model.AcceptDocument'
+        "400":
+          description: Ошибка в запросе
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Принимает новый документ.
       tags:
       - Документы
 swagger: "2.0"

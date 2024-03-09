@@ -11,7 +11,7 @@ import (
 // @description API server for Mars application
 
 // @host http://localhost:8081
-// @BasePath /api/v1
+// @BasePath /api
 
 func main() {
 	log.Println("Application start!")
