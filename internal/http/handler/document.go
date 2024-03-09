@@ -17,6 +17,7 @@ import (
 // @Produce json
 // @Param page query int false "Номер страницы" default(1)
 // @Param pageSize query int false "Размер страницы" default(10)
+// @Param deliveryStatus query string false "Статус доставки" default(PENDING)
 // @Success 200 {array} model.GetDocuments "Успешный ответ"
 // @Failure 500 {object} model.ErrorResponse "Внутренняя ошибка сервера"
 // @Router /document/formed [get]
@@ -24,9 +25,9 @@ func (h *Handler) GetFormedDocuments(c *gin.Context) {
     // Получаем параметры из URL
     page, _ := strconv.Atoi(c.Query("page"))
     pageSize, _ := strconv.Atoi(c.Query("pageSize"))
-
+	deliveryStatus := model.DeliveryStatus(c.Query("deliveryStatus"))
     // Получаем сформированные документы
-    documents, total, err := h.r.GetFormedDocuments(page, pageSize)
+    documents, total, err := h.r.GetFormedDocuments(page, pageSize, deliveryStatus)
     if err != nil {
         c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve documents: " + err.Error()})
         return
