@@ -50,7 +50,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Document"
+                                "$ref": "#/definitions/model.GetDocuments"
                             }
                         }
                     },
@@ -81,35 +81,35 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "ID документа",
                         "name": "id",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Заголовок документа",
                         "name": "title",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Владелец документа",
                         "name": "owner",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Дата и время создания документа в формате RFC3339",
                         "name": "createdAt",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "Payload документа",
                         "name": "payload",
-                        "in": "query",
+                        "in": "formData",
                         "required": true
                     },
                     {
@@ -273,6 +273,20 @@ const docTemplate = `{
                 },
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "model.GetDocuments": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Document"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },

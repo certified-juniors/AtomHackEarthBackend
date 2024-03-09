@@ -59,6 +59,15 @@ definitions:
       path:
         type: string
     type: object
+  model.GetDocuments:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/model.Document'
+        type: array
+      total:
+        type: integer
+    type: object
   model.Status:
     enum:
     - DELETED
@@ -129,7 +138,7 @@ paths:
           description: Успешный ответ
           schema:
             items:
-              $ref: '#/definitions/model.Document'
+              $ref: '#/definitions/model.GetDocuments'
             type: array
         "500":
           description: Внутренняя ошибка сервера
@@ -146,27 +155,27 @@ paths:
         payload и files.
       parameters:
       - description: ID документа
-        in: query
+        in: formData
         name: id
         required: true
         type: integer
       - description: Заголовок документа
-        in: query
+        in: formData
         name: title
         required: true
         type: string
       - description: Владелец документа
-        in: query
+        in: formData
         name: owner
         required: true
         type: string
       - description: Дата и время создания документа в формате RFC3339
-        in: query
+        in: formData
         name: createdAt
         required: true
         type: string
       - description: Payload документа
-        in: query
+        in: formData
         name: payload
         required: true
         type: string

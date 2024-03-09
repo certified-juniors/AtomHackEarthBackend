@@ -17,3 +17,8 @@ type DocumentUpdate struct {
 type AcceptDocument struct {
 	FileIDs []uint `json:"id"`
 }
+
+type GetDocuments struct {
+	Items []Document `json:"items"`
+	Total uint       `json:"total"`
+}
