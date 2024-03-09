@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -103,6 +104,7 @@ func (h *Handler) AcceptDocument(c *gin.Context) {
 
 	form, _ := c.MultipartForm()
 	files := form.File["files"]
+	log.Println(files)
 	if len(files) > 0 {
 		// Файлы присутствуют, выполняем загрузку файлов
 		doc := model.Document{
