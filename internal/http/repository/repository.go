@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/config"
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/db"
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/minio_client"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/config"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/db"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/minio_client"
 )
 
 type Repository struct {

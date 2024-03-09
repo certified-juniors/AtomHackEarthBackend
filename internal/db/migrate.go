@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/model"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/model"
 	"gorm.io/gorm"
 )
 

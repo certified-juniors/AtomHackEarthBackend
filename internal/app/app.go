@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/config"
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/http/handler"
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/http/repository"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/config"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/http/handler"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/http/repository"
 )
 
 type Application struct {

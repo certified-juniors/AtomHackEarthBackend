@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  model.AcceptDocument:
+    properties:
+      id:
+        items:
+          type: integer
+        type: array
+    type: object
   model.DeliveryStatus:
     enum:
     - SUCCESS
@@ -12,6 +19,8 @@ definitions:
     - DeliveryStatusError
   model.Document:
     properties:
+      acceptID:
+        type: integer
       createdAt:
         type: string
       deliveryStatus:
@@ -35,20 +44,6 @@ definitions:
       title:
         type: string
     type: object
-  model.DocumentCreate:
-    properties:
-      id:
-        type: integer
-    type: object
-  model.DocumentUpdate:
-    properties:
-      owner:
-        type: string
-      payload:
-        type: string
-      title:
-        type: string
-    type: object
   model.ErrorResponse:
     properties:
       error:
@@ -64,11 +59,6 @@ definitions:
       path:
         type: string
     type: object
-  model.MessageResponse:
-    properties:
-      message:
-        type: string
-    type: object
   model.Status:
     enum:
     - DELETED
@@ -79,25 +69,57 @@ definitions:
     - StatusDeleted
     - StatusDraft
     - StatusFormed
-host: http://localhost:8080
+host: http://localhost:8081
 info:
   contact: {}
   description: API server for Mars application
   title: AtomHackMarsBackend RestAPI
   version: "1.0"
 paths:
-  /document:
+  /document/:
     post:
       consumes:
       - application/json
-      description: Создает новый документ на основе переданных данных JSON.
+      description: Принимает новый документ с параметрами id, title, owner, createdAt,
+        payload и files.
+      parameters:
+      - description: ID документа
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: Заголовок документа
+        in: query
+        name: title
+        required: true
+        type: string
+      - description: Владелец документа
+        in: query
+        name: owner
+        required: true
+        type: string
+      - description: Дата и время создания документа в формате RFC3339
+        in: query
+        name: createdAt
+        required: true
+        type: string
+      - description: Payload документа
+        in: query
+        name: payload
+        required: true
+        type: string
+      - description: Файлы, прикрепленные к документу
+        in: formData
+        name: files
+        required: true
+        type: file
       produces:
       - application/json
       responses:
         "200":
           description: Успешный ответ
           schema:
-            $ref: '#/definitions/model.DocumentCreate'
+            $ref: '#/definitions/model.AcceptDocument'
         "400":
           description: Ошибка в запросе
           schema:
@@ -106,38 +128,10 @@ paths:
           description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/model.ErrorResponse'
-      summary: Создает новый документ.
+      summary: Принимает новый документ.
       tags:
       - Документы
   /document/{docID}:
-    delete:
-      consumes:
-      - application/json
-      description: Удаляет документ из репозитория по указанному ID.
-      parameters:
-      - description: ID документа
-        in: path
-        name: docID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ
-          schema:
-            $ref: '#/definitions/model.MessageResponse'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Удаляет документ по ID.
-      tags:
-      - Документы
     get:
       consumes:
       - application/json
@@ -166,15 +160,22 @@ paths:
       summary: Получает документ по ID.
       tags:
       - Документы
-    post:
+  /document/formed:
+    get:
       consumes:
       - application/json
-      description: Отправляет документ на Землю по docID.
+      description: Возвращает список сформированных документов с учетом параметров
+        page и pageSize.
       parameters:
-      - description: ID документа
-        in: path
-        name: docID
-        required: true
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Размер страницы
+        in: query
+        name: pageSize
         type: integer
       produces:
       - application/json
@@ -182,118 +183,14 @@ paths:
         "200":
           description: Успешный ответ
           schema:
-            $ref: '#/definitions/model.MessageResponse'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
+            items:
+              $ref: '#/definitions/model.Document'
+            type: array
         "500":
           description: Внутренняя ошибка сервера
           schema:
             $ref: '#/definitions/model.ErrorResponse'
-      summary: Отправляет документ на Землю.
+      summary: Возвращает сформированные документы.
       tags:
       - Документы
-    put:
-      consumes:
-      - application/json
-      description: Обновляет информацию о документе на основе переданных данных JSON.
-      parameters:
-      - description: ID документа
-        in: path
-        name: docID
-        required: true
-        type: integer
-      - description: Пользовательский объект в формате JSON
-        in: body
-        name: doc
-        required: true
-        schema:
-          $ref: '#/definitions/model.DocumentUpdate'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ
-          schema:
-            $ref: '#/definitions/model.MessageResponse'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Обновляет информацию о документе.
-      tags:
-      - Документы
-  /document/{docID}/file:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Загружает файл в хранилище MinIO и связывает его с указанным документом.
-      parameters:
-      - description: Идентификатор документа
-        in: path
-        name: docID
-        required: true
-        type: integer
-      - description: Файл для загрузки
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ
-          schema:
-            $ref: '#/definitions/model.MessageResponse'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Загружает файл.
-      tags:
-      - Файлы
-  /document/{docID}/file/{fileID}:
-    delete:
-      consumes:
-      - application/json
-      description: Удаляет файл из хранилища MinIO и из базы данных.
-      parameters:
-      - description: Идентификатор документа
-        in: path
-        name: docID
-        required: true
-        type: integer
-      - description: Идентификатор файла
-        in: path
-        name: fileID
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Успешный ответ
-          schema:
-            $ref: '#/definitions/model.MessageResponse'
-        "400":
-          description: Ошибка в запросе
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      summary: Удаляет файл.
-      tags:
-      - Файлы
 swagger: "2.0"

@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/SicParv1sMagna/AtomHackMarsService/internal/config"
+	"github.com/certified-juniors/AtomHackEarthBackend/internal/config"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -26,29 +26,6 @@ func (m *Minio) UploadFile(objectName string, file multipart.File, fileSize int6
 		return "", err
 	}
 
-	 fileURL := fmt.Sprintf("https://%s/%s/%s", m.MinioCfg.Endpoint, m.MinioCfg.MinioBucket, objectName)
+	 fileURL := fmt.Sprintf("%s/%s/%s", m.MinioCfg.Endpoint, m.MinioCfg.MinioBucket, objectName)
 	 return fileURL, nil
-}
-
-func (m *Minio) DownloadFile(objectName string) (multipart.File, error) {
-    ctx := context.Background()
-
-    reader, err := m.MinioClient.GetObject(ctx, m.MinioCfg.MinioBucket, objectName, minio.GetObjectOptions{})
-    if err != nil {
-        return nil, err
-    }
-
-    return reader, nil
-}
-
-func (m *Minio) DeleteFile(objectName string) error {
-	ctx := context.Background()
-
-	err := m.MinioClient.RemoveObject(ctx, m.MinioCfg.MinioBucket, objectName, minio.RemoveObjectOptions{})
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("Successfully deleted %s from MinIO\n", objectName)
-	return nil
 }

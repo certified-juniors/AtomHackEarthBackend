@@ -14,6 +14,6 @@ type DocumentUpdate struct {
 	Payload string `json:"payload"`
 }
 
-type DocumentCreate struct {
-	ID uint `json:"id"`
+type AcceptDocument struct {
+	FileIDs []uint `json:"id"`
 }
