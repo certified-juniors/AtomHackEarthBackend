@@ -67,34 +67,34 @@ func (h *Handler) GetDocumentByID(c *gin.Context) {
 // @Tags Документы
 // @Accept json
 // @Produce json
-// @Param id query int true "ID документа"
-// @Param title query string true "Заголовок документа"
-// @Param owner query string true "Владелец документа"
-// @Param createdAt query string true "Дата и время создания документа в формате RFC3339"
-// @Param payload query string true "Payload документа"
+// @Param id formData int true "ID документа"
+// @Param title formData string true "Заголовок документа"
+// @Param owner formData string true "Владелец документа"
+// @Param createdAt formData string true "Дата и время создания документа в формате RFC3339"
+// @Param payload formData string true "Payload документа"
 // @Param files formData file true "Файлы, прикрепленные к документу"
 // @Success 200 {object} model.AcceptDocument "Успешный ответ"
 // @Failure 400 {object} model.ErrorResponse "Ошибка в запросе"
 // @Failure 500 {object} model.ErrorResponse "Внутренняя ошибка сервера"
 // @Router /document/send-to-earth [post]
 func (h *Handler) AcceptDocument(c *gin.Context) {
-	acceptID, err := strconv.Atoi(c.Query("id"))
+	acceptID, err := strconv.Atoi(c.PostForm("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to get id from request"})
 		return
 	}
 
-	title := c.Query("title")
-	owner := c.Query("owner")
+	title := c.PostForm("title")
+	owner := c.PostForm("owner")
 
-	createdAtStr := c.Query("createdAt")
+	createdAtStr := c.PostForm("createdAt")
 	createdAt, err := time.Parse(time.RFC3339, createdAtStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse createdAt"})
 		return
 	}
 
-	payload := c.Query("payload")
+	payload := c.PostForm("payload")
 
 	receivedTime := time.Now()
 	deliveryStatus := model.DeliveryStatusSuccess
