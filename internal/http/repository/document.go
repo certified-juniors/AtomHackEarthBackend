@@ -1,23 +1,25 @@
 package repository
 
 import (
+	"strings"
+
 	"github.com/certified-juniors/AtomHackEarthBackend/internal/model"
 )
 
-func (r *Repository) GetDocumentsCount(status model.Status, deliveryStatus model.DeliveryStatus, ownerOrTitle string) (uint, error) {
+func (r *Repository) GetDocumentsFormedCount(status model.Status, deliveryStatus model.DeliveryStatus, ownerOrTitle string) (uint, error) {
     var count int64
     query := r.db.DatabaseGORM.Model(&model.Document{})
 
     if status != "" {
-        query = query.Where("status = ?", status)
+        query = query.Where("LOWER(status) = LOWER(?)", status)
     }
 
     if deliveryStatus != "" {
-        query = query.Where("delivery_status = ?", deliveryStatus)
+        query = query.Where("LOWER(delivery_status) = LOWER(?)", deliveryStatus)
     }
 
     if ownerOrTitle != "" {
-        query = query.Where("owner LIKE ? OR title LIKE ?", "%"+ownerOrTitle+"%", "%"+ownerOrTitle+"%")
+        query = query.Where("LOWER(owner) LIKE ? OR LOWER(title) LIKE ?", "%"+strings.ToLower(ownerOrTitle)+"%", "%"+strings.ToLower(ownerOrTitle)+"%")
     }
 
     if err := query.Count(&count).Error; err != nil {
@@ -34,7 +36,7 @@ func (r *Repository) GetFormedDocuments(page, pageSize int, deliveryStatus model
     query := r.db.DatabaseGORM
 
     if deliveryStatus != "" {
-        query = query.Where("delivery_status = ?", deliveryStatus)
+        query = query.Where("LOWER(delivery_status) = LOWER(?)", deliveryStatus)
 
         if deliveryStatus == model.DeliveryStatusSuccess {
             query = query.Order("received_time DESC")
@@ -42,18 +44,19 @@ func (r *Repository) GetFormedDocuments(page, pageSize int, deliveryStatus model
             query = query.Order("sent_time DESC")
         }
     } else {
-        query = query.Where("status = ?", model.StatusFormed).Order("sent_time DESC")
+        query = query.Where("LOWER(status) = LOWER(?)", model.StatusFormed).Order("sent_time DESC")
     }
 
     if ownerOrTitle != "" {
-        query = query.Where("owner LIKE ? OR title LIKE ?", "%"+ownerOrTitle+"%", "%"+ownerOrTitle+"%")
+        ownerOrTitle = strings.ToLower(ownerOrTitle)
+        query = query.Where("LOWER(owner) LIKE ? OR LOWER(title) LIKE ?", "%"+ownerOrTitle+"%", "%"+ownerOrTitle+"%")
     }
 
     if err := query.Offset(offset).Limit(pageSize).Find(&documents).Error; err != nil {
         return nil, 0, err
     }
 
-    total, err := r.GetDocumentsCount(model.StatusFormed, deliveryStatus, ownerOrTitle)
+    total, err := r.GetDocumentsFormedCount(model.StatusFormed, deliveryStatus, ownerOrTitle)
     if err != nil {
         return nil, 0, err
     }

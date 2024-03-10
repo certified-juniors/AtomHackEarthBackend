@@ -39,6 +39,7 @@ func (h *Handler) GetFormedDocuments(c *gin.Context) {
     c.JSON(http.StatusOK, gin.H{"items":documents,
 								"total": total})
 }
+
 // GetDocumentByID получает документ по его ID.
 // @Summary Получает документ по ID.
 // @Description Получает документ из репозитория по указанному ID.
