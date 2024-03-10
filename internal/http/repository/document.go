@@ -4,50 +4,56 @@ import (
 	"github.com/certified-juniors/AtomHackEarthBackend/internal/model"
 )
 
-func (r *Repository) GetDocumentsCountByStatus(status model.Status) (uint, error) {
+func (r *Repository) GetDocumentsCount(status model.Status, deliveryStatus model.DeliveryStatus, ownerOrTitle string) (uint, error) {
     var count int64
-    if err := r.db.DatabaseGORM.Model(&model.Document{}).Where("status = ?", status).Count(&count).Error; err != nil {
+    query := r.db.DatabaseGORM.Model(&model.Document{})
+
+    if status != "" {
+        query = query.Where("status = ?", status)
+    }
+
+    if deliveryStatus != "" {
+        query = query.Where("delivery_status = ?", deliveryStatus)
+    }
+
+    if ownerOrTitle != "" {
+        query = query.Where("owner LIKE ? OR title LIKE ?", "%"+ownerOrTitle+"%", "%"+ownerOrTitle+"%")
+    }
+
+    if err := query.Count(&count).Error; err != nil {
         return 0, err
     }
+
     return uint(count), nil
 }
 
-func (r *Repository) GetDocumentsCountByDeliveryStatus(deliveryStatus model.DeliveryStatus) (uint, error) {
-    var count int64
-    if err := r.db.DatabaseGORM.Model(&model.Document{}).Where("delivery_status = ?", deliveryStatus).Count(&count).Error; err != nil {
-        return 0, err
-    }
-    return uint(count), nil
-}
-
-func (r *Repository) GetFormedDocuments(page, pageSize int, deliveryStatus model.DeliveryStatus) ([]model.Document, uint, error) {
+func (r *Repository) GetFormedDocuments(page, pageSize int, deliveryStatus model.DeliveryStatus, ownerOrTitle string) ([]model.Document, uint, error) {
     var documents []model.Document
     offset := (page - 1) * pageSize
 
+    query := r.db.DatabaseGORM
+
     if deliveryStatus != "" {
-        if deliveryStatus == model.DeliveryStatusSuccess{
-            if err := r.db.DatabaseGORM.Where("delivery_status = ?", deliveryStatus).Order("received_time DESC").Offset(offset).Limit(pageSize).Find(&documents).Error; err != nil {
-                return nil, 0, err
-            }
-        } else if deliveryStatus == model.DeliveryStatusPending{
-            if err := r.db.DatabaseGORM.Where("delivery_status = ?", deliveryStatus).Order("sent_time DESC").Offset(offset).Limit(pageSize).Find(&documents).Error; err != nil {
-                return nil, 0, err
-            }
-        }
+        query = query.Where("delivery_status = ?", deliveryStatus)
 
-        total, err := r.GetDocumentsCountByDeliveryStatus(deliveryStatus)
-        if err != nil {
-            return nil, 0, err
+        if deliveryStatus == model.DeliveryStatusSuccess {
+            query = query.Order("received_time DESC")
+        } else if deliveryStatus == model.DeliveryStatusPending {
+            query = query.Order("sent_time DESC")
         }
-
-        return documents, total, nil
+    } else {
+        query = query.Where("status = ?", model.StatusFormed).Order("sent_time DESC")
     }
 
-    if err := r.db.DatabaseGORM.Where("status = ?", model.StatusFormed).Order("sent_time DESC").Offset(offset).Limit(pageSize).Find(&documents).Error; err != nil {
+    if ownerOrTitle != "" {
+        query = query.Where("owner LIKE ? OR title LIKE ?", "%"+ownerOrTitle+"%", "%"+ownerOrTitle+"%")
+    }
+
+    if err := query.Offset(offset).Limit(pageSize).Find(&documents).Error; err != nil {
         return nil, 0, err
     }
 
-    total, err := r.GetDocumentsCountByStatus(model.StatusFormed)
+    total, err := r.GetDocumentsCount(model.StatusFormed, deliveryStatus, ownerOrTitle)
     if err != nil {
         return nil, 0, err
     }

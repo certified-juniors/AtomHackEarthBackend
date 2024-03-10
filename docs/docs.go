@@ -42,6 +42,19 @@ const docTemplate = `{
                         "description": "Размер страницы",
                         "name": "pageSize",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "default": "PENDING",
+                        "description": "Статус доставки",
+                        "name": "deliveryStatus",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Отправитель или Название",
+                        "name": "ownerOrTitle",
+                        "in": "query"
                     }
                 ],
                 "responses": {
