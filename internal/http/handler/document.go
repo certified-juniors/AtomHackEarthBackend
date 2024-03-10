@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -98,6 +97,12 @@ func (h *Handler) AcceptDocument(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse createdAt"})
 		return
 	}
+	sentTimeStr := c.PostForm("sentTime")
+	sentTime, err := time.Parse(time.RFC3339, sentTimeStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse sentTime"})
+		return
+	}
 
 	payload := c.PostForm("payload")
 
@@ -105,15 +110,7 @@ func (h *Handler) AcceptDocument(c *gin.Context) {
 	deliveryStatus := model.DeliveryStatusSuccess
 
 	form, _ := c.MultipartForm()
-	log.Println(form)
 	files := form.File["files"]
-	log.Println(files)
-	for _, file := range files {
-		log.Println("Filename:", file.Filename)
-		log.Println("Size:", file.Size)
-		log.Println("Header:", file.Header)
-		// Другие доступные свойства в объекте file
-	}
 	if len(files) > 0 {
 		// Файлы присутствуют, выполняем загрузку файлов
 		doc := model.Document{
@@ -123,6 +120,7 @@ func (h *Handler) AcceptDocument(c *gin.Context) {
 			ReceivedTime:    &receivedTime,
 			Status:          model.StatusFormed,
 			CreatedAt:       createdAt,
+			SentTime: 		 &sentTime,
 			DeliveryStatus:  &deliveryStatus,
 			Payload:         payload,
 		}
