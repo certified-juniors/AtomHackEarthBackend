@@ -103,8 +103,15 @@ func (h *Handler) AcceptDocument(c *gin.Context) {
 	deliveryStatus := model.DeliveryStatusSuccess
 
 	form, _ := c.MultipartForm()
+	log.Println(form)
 	files := form.File["files"]
 	log.Println(files)
+	for _, file := range files {
+		log.Println("Filename:", file.Filename)
+		log.Println("Size:", file.Size)
+		log.Println("Header:", file.Header)
+		// Другие доступные свойства в объекте file
+	}
 	if len(files) > 0 {
 		// Файлы присутствуют, выполняем загрузку файлов
 		doc := model.Document{
